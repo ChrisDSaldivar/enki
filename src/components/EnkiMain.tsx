@@ -77,6 +77,8 @@ export default function EnkiMain(props: Props) {
   const [notes, updateNotes] = useState<any[]>([]);
 
   async function getRepos() {
+    // TODO: Update code so commits from repos the user collaborates on are
+    // also accessible. Currently we can get the repos but not the commits
     const { data } = await octokit.rest.repos.listForAuthenticatedUser({
       type: 'owner',
       sort: 'updated',
