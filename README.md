@@ -2,9 +2,9 @@
 
 A desktop app that provides a GUI for taking notes on github repos/commits. You will need a github personal access token to display your repos. You can download the latest version of the app in the release: https://github.com/ChrisDSaldivar/enki/releases/latest.
 
-- Intel Mac: [download](https://github.com/ChrisDSaldivar/enki/releases/download/v1.0.5/Enki-1.0.5.dmg)
-- ARM (M1/M2) Mac: [download](https://github.com/ChrisDSaldivar/enki/releases/download/v1.0.5/Enki-1.0.5.dmg)
-- Windows: [download](https://github.com/ChrisDSaldivar/enki/releases/download/v1.0.5/Enki-Setup-1.0.5.exe)
+- Intel Mac: [download](https://github.com/ChrisDSaldivar/enki/releases/download/v1.0.7/Enki-1.0.7.dmg)
+- ARM (M1/M2) Mac: [download](https://github.com/ChrisDSaldivar/enki/releases/download/v1.0.7/Enki-1.0.7.dmg)
+- Windows: [download](https://github.com/ChrisDSaldivar/enki/releases/download/v1.0.7/Enki-Setup-1.0.7.exe)
 
 ## Generating an Access Token
 
@@ -32,14 +32,6 @@ A desktop app that provides a GUI for taking notes on github repos/commits. You 
 
 Now open Enki and you'll be prompted for a password and your GitHub access token. You should paste your access token in this field. Enki will use whatever password you give it to encrypt your access token and then store the encrypted token on your local machine. If you forget your password then you'll have to repeat this process and generate a new token.
 
-# Optional Helper Script: MacOS
-
-Copy and run the following command to download the shell script. This script can be used in lieu of running `python3` directly. It will run the python script *and* detect any error codes + log std out and std error. Then it will automatically prompt if you would like to commit your code. This way you can run your code like normal and the script will remind you to commit your code. It is recommended that you use this script since Enki can display the log files that it generates in the UI.
-
-```sh
-curl "https://enki-dist.s3.amazonaws.com/py-commit" -s -o /usr/local/bin/py-commit && chmod +x /usr/local/bin/py-commit
-```
-
 ## Making a repo
 
 If you don't currently use a project folder on your computer then you should start. This will help you organize all of your code. I use a `projects` directory in my home directory. Use these commands to create one:
@@ -57,6 +49,8 @@ Now whenever you are working on a project you should `cd` into your project dire
 # cd -- means "change directory" 
 cd ~/projects
 ```
+
+You should create a new repo every time you start working on a new project/assignment. 
 
 ### Step 0: Log into GitHub
 
@@ -110,9 +104,18 @@ Now follow these steps to create the item.
 
 From this point forward you'll be able to push/pull to private repos without issue. If you set the token to expire then you'll need to generate a new token and update the KeyChain item whenever the old one expires. 
 
+# Optional Helper Script: (MacOS Only)
+
+Copy and run the following command to download the shell script. This script can be used in lieu of running `python3` directly. It will run the python script *and* detect any error codes + log std out and std error. Then it will automatically prompt if you would like to commit your code. This way you can run your code like normal and the script will remind you to commit your code. It is recommended that you use this script since Enki can display the log files that it generates in the UI.
+
+```sh
+curl "https://enki-dist.s3.amazonaws.com/py-commit" -s -o /usr/local/bin/py-commit && chmod +x /usr/local/bin/py-commit
+```
+
+
 ## Using `py-commit`
 
-Now that you have a repo set up and you have `py-commit` installed you can get started. Rather than running code using `python3 myScript.py` instead you will use `py-commit myScript.py` and `py-commit` will handle things from there.
+Now that you have a repo set up and you have `py-commit` installed you can get started. Rather than running code using `python3 myScript.py` instead you will use `py-commit myScript.py` and `py-commit` will handle things from there. It will ask if you want to commit your code every time it runs so that I can handle maintaining versions for you. If you are using a private repo then you'll need to give your Mac KeyChain access to a github access token. 
 
 ## License
 
