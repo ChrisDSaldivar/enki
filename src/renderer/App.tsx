@@ -1,50 +1,33 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import icon from '../../assets/icon.svg';
+import { useState, createContext } from 'react';
+import {
+  MemoryRouter as Router,
+  Routes,
+  Route,
+} from 'react-router-dom';
 import './App.css';
+import 'tailwindcss/tailwind.css';
+import { Octokit } from '@octokit/rest';
 
-const Hello = () => {
-  return (
-    <div>
-      <div className="Hello">
-        <img width="200" alt="icon" src={icon} />
-      </div>
-      <h1>electron-react-boilerplate</h1>
-      <div className="Hello">
-        <a
-          href="https://electron-react-boilerplate.js.org/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="books">
-              📚
-            </span>
-            Read our docs
-          </button>
-        </a>
-        <a
-          href="https://github.com/sponsors/electron-react-boilerplate"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="folded hands">
-              🙏
-            </span>
-            Donate
-          </button>
-        </a>
-      </div>
-    </div>
-  );
-};
+import LoginPage from '../components/LoginPage';
+import EnkiMain from '../components/EnkiMain';
+
+const OctokitContext = createContext<{
+  octokit: Octokit | undefined;
+  setOctokit: any;
+}>({ octokit: undefined, setOctokit: undefined });
+
 
 export default function App() {
+  const [octokit, setOctokit] = useState<Octokit | undefined>();
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Hello />} />
-      </Routes>
-    </Router>
+    <OctokitContext.Provider value={{ octokit, setOctokit }}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<LoginPage OctokitContext={OctokitContext} />} />
+          <Route path="/app" element={<EnkiMain OctokitContext={OctokitContext} />} />
+        </Routes>
+      </Router>
+    </OctokitContext.Provider>
   );
 }

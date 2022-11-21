@@ -2,6 +2,42 @@
  * @NOTE: Prepend a `~` to css file paths that are in your node_modules
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Fira Code";
+  src: url("../../assets/fonts/Fira_Code/FiraCode-Regular.woff2");
+}
+
+code span, .fira {
+  font-family: 'Fira Code' !important;
+}
+
+pre>code>span {
+  padding-left: 10px;
+}
+
+pre>code>span.line_number, pre>code>span>span.linenumber {
+  /* color: rgb(158, 249, 190) !important; */
+  border-right: 1px solid;
+  box-sizing: border-box;
+  margin-right: 5px;
+}
+
+.note-available {
+  position: relative;
+}
+
+.note-available::before {
+  content: '📝';
+  position: absolute;
+  left: -10px;
+}
+
+/* 
 body {
   position: relative;
   color: white;
@@ -59,4 +95,4 @@ a:hover {
   justify-content: center;
   align-items: center;
   margin: 20px 0;
-}
+} */

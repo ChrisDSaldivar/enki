@@ -12,8 +12,142 @@ import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import {
+  pbkdf2,
+  randomBytes,
+  createCipheriv,
+  createDecipheriv,
+} from 'node:crypto';
+import { readFile, access, writeFile } from 'node:fs/promises';
+import { promisify } from 'util';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import Note from '../models/NotesModel';
+
+import {
+  Sequelize,
+  DataTypes,
+} from 'sequelize';
+
+app.setAppUserModelId("com.quetzalSoftwareLLC.Enki");
+
+const pbkdf2Promise = promisify(pbkdf2);
+
+(async () => {
+  const dir = app.getPath('userData');
+  const notesDB = path.join(dir, 'notes-database.sqlite');
+  const sequelize = new Sequelize({
+    dialect: 'sqlite',
+    storage: notesDB,
+  });
+  
+  Note.init(
+    {
+      commit: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        primaryKey: true,
+      },
+      lineNumber: {
+        type: DataTypes.NUMBER,
+        allowNull: false,
+        primaryKey: true,
+      },
+      repo: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        primaryKey: true,
+      },
+      owner: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        primaryKey: true,
+      },
+      file: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        primaryKey: true,
+      },
+      note: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+    },
+    { sequelize }
+  );
+
+  await sequelize.sync();
+})();
+
+
+async function exists(path: string) {
+  try {
+    await access(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function createCipher(key: Buffer) {
+  const iv = randomBytes(64).toString('hex');
+  return { iv, cipher: createCipheriv('aes-256-gcm', key, iv) };
+}
+
+function createDeCipher(key: Buffer, iv: string) {
+  return createDecipheriv('aes-256-gcm', key, iv);
+}
+
+async function setAuth(pass: string, authToken: string) {
+  const salt = randomBytes(16).toString('hex');
+  const key = await pbkdf2Promise(pass, salt, 2145, 32, 'sha512');
+
+  const { iv, cipher } = createCipher(key);
+  const cipherText = cipher.update(authToken, 'ascii', 'hex');
+  cipher.final();
+  const tag = cipher.getAuthTag().toString('hex');
+
+  const dir = app.getPath('userData');
+  const authFilename = path.join(dir, 'auth.txt');
+
+  await writeFile(authFilename, `${salt}\n${iv}\n${tag}\n${cipherText}\n`);
+}
+
+// AUTH FILE FORMAT
+/*
+salt for pbkdf2
+iv for aes
+authTag for aes
+authToken
+*/
+
+async function getAuth(pass: string) {
+  const dir = app.getPath('userData');
+  const authFilename = path.join(dir, 'auth.txt');
+  const authFileExists = await exists(authFilename);
+
+  if (!authFileExists) {
+    return;
+  }
+
+  const authFileContent = await readFile(authFilename);
+
+  const [salt, iv, authTag, encryptedToken] = Buffer.from(authFileContent)
+    .toString('ascii')
+    .split('\n');
+
+  const key = await pbkdf2Promise(pass, salt, 2145, 32, 'sha512');
+  const decipher = createDeCipher(key, iv);
+
+  decipher.setAuthTag(Buffer.from(authTag, 'hex'));
+
+  const receivedPlaintext = decipher.update(encryptedToken, 'hex', 'ascii');
+
+  try {
+    decipher.final();
+    return receivedPlaintext;
+  } catch (err) {}
+}
 
 class AppUpdater {
   constructor() {
@@ -25,10 +159,60 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
+ipcMain.on('check-auth-file', async (event, arg) => {
+  const dir = app.getPath('userData');
+  const authFilename = path.join(dir, 'auth.txt');
+  const authFileExists = await exists(authFilename);
+
+  event.reply('check-auth-file', { authFileExists });
+});
+
+ipcMain.on('get-auth', async (event, arg) => {
+  const { pass } = arg[0];
+  const authToken = await getAuth(pass);
+  event.reply('get-auth', authToken);
+});
+
+ipcMain.on('set-auth', async (event, arg) => {
+  const { pass, authToken } = arg[0];
+  await setAuth(pass, authToken);
+  event.reply('set-auth', true);
+});
+
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
+});
+
+ipcMain.on('create-note', async (event, arg) => {
+  console.log('Create-note: ');
+
+  console.log(arg[0]);
+  await Note.upsert(arg[0]);
+
+  event.reply('create-note', 'note-created');
+});
+
+ipcMain.on('get-note', async (event, arg) => {
+  console.log('get-note: ');
+  const { owner, commit, file, lineNumber } = arg[0];
+
+  console.log();
+  const note = await Note.findOne({
+    where: { owner, commit, file, lineNumber },
+  });
+
+  event.reply('get-note', note?.dataValues);
+});
+
+ipcMain.on('get-notes', async (event, arg) => {
+  console.log('get-notes: ');
+
+  const { owner, commit, file } = arg[0];
+  const notes = await Note.findAll({ where: { owner, commit, file } });
+
+  event.reply('get-notes', notes);
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -71,8 +255,8 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728,
+    width: 1920,
+    height: 1080,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
