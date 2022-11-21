@@ -20,16 +20,12 @@ import {
 } from 'node:crypto';
 import { readFile, access, writeFile } from 'node:fs/promises';
 import { promisify } from 'util';
+import { Sequelize, DataTypes } from 'sequelize';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import Note from '../models/NotesModel';
 
-import {
-  Sequelize,
-  DataTypes,
-} from 'sequelize';
-
-app.setAppUserModelId("com.quetzalSoftwareLLC.Enki");
+app.setAppUserModelId('com.quetzalSoftwareLLC.Enki');
 
 const pbkdf2Promise = promisify(pbkdf2);
 
@@ -40,7 +36,7 @@ const pbkdf2Promise = promisify(pbkdf2);
     dialect: 'sqlite',
     storage: notesDB,
   });
-  
+
   Note.init(
     {
       commit: {
@@ -79,10 +75,9 @@ const pbkdf2Promise = promisify(pbkdf2);
   await sequelize.sync();
 })();
 
-
-async function exists(path: string) {
+async function exists(filepath: string) {
   try {
-    await access(path);
+    await access(filepath);
     return true;
   } catch {
     return false;
@@ -121,13 +116,13 @@ authTag for aes
 authToken
 */
 
-async function getAuth(pass: string) {
+async function getAuth(pass: string): Promise<string | undefined> {
   const dir = app.getPath('userData');
   const authFilename = path.join(dir, 'auth.txt');
   const authFileExists = await exists(authFilename);
 
   if (!authFileExists) {
-    return;
+    return undefined;
   }
 
   const authFileContent = await readFile(authFilename);
@@ -146,7 +141,9 @@ async function getAuth(pass: string) {
   try {
     decipher.final();
     return receivedPlaintext;
-  } catch (err) {}
+  } catch (err) {
+    return undefined;
+  }
 }
 
 class AppUpdater {

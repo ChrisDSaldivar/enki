@@ -2,9 +2,9 @@
 
 A desktop app that provides a GUI for taking notes on github repos/commits. You will need a github personal access token to display your repos. You can download the latest version of the app in the release: https://github.com/ChrisDSaldivar/enki/releases/latest.
 
-- Intel Mac: [download](https://github.com/ChrisDSaldivar/enki/releases/download/v1.0.4/Enki-1.0.4.dmg)
-- ARM (M1/M2) Mac: [download](https://github.com/ChrisDSaldivar/enki/releases/download/v1.0.4/Enki-1.0.4.dmg)
-- Windows: [download](https://github.com/ChrisDSaldivar/enki/releases/download/v1.0.4/Enki-Setup-1.0.4.exe)
+- Intel Mac: [download](https://github.com/ChrisDSaldivar/enki/releases/download/v1.0.5/Enki-1.0.5.dmg)
+- ARM (M1/M2) Mac: [download](https://github.com/ChrisDSaldivar/enki/releases/download/v1.0.5/Enki-1.0.5.dmg)
+- Windows: [download](https://github.com/ChrisDSaldivar/enki/releases/download/v1.0.5/Enki-Setup-1.0.5.exe)
 
 ## Generating an Access Token
 

@@ -132,34 +132,36 @@ export default function LoginPage(props: Props) {
               <input type="hidden" name="remember" defaultValue="true" />
               <div className="-space-y-px rounded-md shadow-sm">
                 <div>
+                  {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                   <label htmlFor="password" className="sr-only">
                     Password
-                    <input
-                      ref={passwordRef}
-                      id="password"
-                      name="password"
-                      type="password"
-                      autoComplete="current-password"
-                      required
-                      className="bg-slate-700 relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-300 placeholder-gray-500 focus:z-10 focus:border-cyan-500 focus:outline-none focus:ring-cyan-500 sm:text-sm"
-                      placeholder="Password"
-                    />
                   </label>
+                  <input
+                    ref={passwordRef}
+                    id="password"
+                    name="password"
+                    type="password"
+                    autoComplete="current-password"
+                    required
+                    className="bg-slate-700 relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-300 placeholder-gray-500 focus:z-10 focus:border-cyan-500 focus:outline-none focus:ring-cyan-500 sm:text-sm"
+                    placeholder="Password"
+                  />
                 </div>
                 <div>
+                  {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                   <label htmlFor="authToken" className="sr-only">
                     Auth Token
-                    <input
-                      ref={authTokenRef}
-                      id="authToken"
-                      name="authToken"
-                      type="authToken"
-                      autoComplete="authToken"
-                      required
-                      className="bg-slate-700 relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-300 placeholder-gray-500 focus:z-10 focus:border-cyan-500 focus:outline-none focus:ring-cyan-500 sm:text-sm"
-                      placeholder="Auth Token"
-                    />
                   </label>
+                  <input
+                    ref={authTokenRef}
+                    id="authToken"
+                    name="authToken"
+                    type="authToken"
+                    autoComplete="authToken"
+                    required
+                    className="bg-slate-700 relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-300 placeholder-gray-500 focus:z-10 focus:border-cyan-500 focus:outline-none focus:ring-cyan-500 sm:text-sm"
+                    placeholder="Auth Token"
+                  />
                 </div>
               </div>
 
@@ -196,19 +198,20 @@ export default function LoginPage(props: Props) {
               <input type="hidden" name="remember" defaultValue="true" />
               <div className="-space-y-px rounded-md shadow-sm">
                 <div>
+                  {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                   <label htmlFor="passwordAuthFile" className="sr-only">
                     Password
-                    <input
-                      ref={passwordRef}
-                      id="passwordAuthFile"
-                      name="password"
-                      type="password"
-                      autoComplete="current-password"
-                      required
-                      className="bg-slate-700 relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-300 placeholder-gray-500 focus:z-10 focus:border-cyan-500 focus:outline-none focus:ring-cyan-500 sm:text-sm"
-                      placeholder="Password"
-                    />
                   </label>
+                  <input
+                    ref={passwordRef}
+                    id="passwordAuthFile"
+                    name="password"
+                    type="password"
+                    autoComplete="current-password"
+                    required
+                    className="bg-slate-700 relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-300 placeholder-gray-500 focus:z-10 focus:border-cyan-500 focus:outline-none focus:ring-cyan-500 sm:text-sm"
+                    placeholder="Password"
+                  />
                 </div>
               </div>
 
