@@ -1,3 +1,8 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import { useEffect, useState, createContext, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -138,7 +143,9 @@ export default function EnkiMain(props: Props) {
       );
 
       updateCommits(newCommits);
-    } catch {}
+    } catch {
+      /* empty */
+    }
   }
 
   const getCommit = async (file: string, commit_sha = '') => {
@@ -167,7 +174,9 @@ export default function EnkiMain(props: Props) {
     updateCommitRef(ref);
     updateCode('');
 
-    const commit = commits.find((currCommit) => currCommit.commit.sha === ref)?.data;
+    const commit = commits.find(
+      (currCommit) => currCommit.commit.sha === ref
+    )?.data;
     const files = commit
       /* eslint-disable-next-line */
         /* @ts-ignore */
@@ -339,8 +348,8 @@ export default function EnkiMain(props: Props) {
           </div>
         </div>
 
-        <div className="flex h-full border-t border-gray-500 overflow-scroll overscroll-contain">
-          <div className="commits w-96 h-full border-r border-gray-500 overflow-scroll overscroll-contain">
+        <div className="flex h-full border-t border-gray-500 overflow-scroll scrollbar-hide overscroll-contain">
+          <div className="commits w-96 h-full border-r border-gray-500 overflow-scroll scrollbar-hide overscroll-contain">
             <ul className="flex flex-col divide-y text-sm">
               {commits.length > 0
                 ? commits.map((commit) => {
@@ -360,7 +369,7 @@ export default function EnkiMain(props: Props) {
                 : 'This repo has no commits'}
             </ul>
           </div>
-          <div className="files w-72 max-w-96 max-h-full overflow-scroll overscroll-contain">
+          <div className="files w-72 max-w-96 max-h-full overflow-scroll scrollbar-hide overscroll-contain">
             <ul className="flex flex-col divide-y h-full border-r border-gray-500">
               {files.map((file) => {
                 /* eslint-disable-next-line */
@@ -380,7 +389,7 @@ export default function EnkiMain(props: Props) {
               })}
             </ul>
           </div>
-          <div className="viewer text-left h-full w-full overflow-scroll overscroll-contain">
+          <div className="viewer text-left h-full w-full overflow-scroll scrollbar-hide overscroll-contain">
             {code && (
               <SyntaxHighlighter
                 showLineNumbers

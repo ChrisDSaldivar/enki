@@ -12,6 +12,16 @@
   src: url("../../assets/fonts/Fira_Code/FiraCode-Regular.woff2");
 }
 
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* For IE, Edge and Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
 code span, .fira {
   font-family: 'Fira Code' !important;
 }
@@ -37,7 +47,7 @@ pre>code>span.line_number, pre>code>span>span.linenumber {
   left: -10px;
 }
 
-/* 
+/*
 body {
   position: relative;
   color: white;
