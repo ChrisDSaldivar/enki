@@ -4,6 +4,7 @@ A desktop app that provides a GUI for taking notes on github repos/commits. You 
 
 - Intel Mac: [download](https://github.com/ChrisDSaldivar/enki/releases/download/v1.0.4/Enki-1.0.4.dmg)
 - ARM (M1/M2) Mac: [download](https://github.com/ChrisDSaldivar/enki/releases/download/v1.0.4/Enki-1.0.4.dmg)
+- Windows: [download](https://github.com/ChrisDSaldivar/enki/releases/download/v1.0.4/Enki-Setup-1.0.4.exe)
 
 ## Generating an Access Token
 
