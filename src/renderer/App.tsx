@@ -1,9 +1,5 @@
 import { useState, createContext } from 'react';
-import {
-  MemoryRouter as Router,
-  Routes,
-  Route,
-} from 'react-router-dom';
+import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import 'tailwindcss/tailwind.css';
 import { Octokit } from '@octokit/rest';
@@ -16,7 +12,6 @@ const OctokitContext = createContext<{
   setOctokit: any;
 }>({ octokit: undefined, setOctokit: undefined });
 
-
 export default function App() {
   const [octokit, setOctokit] = useState<Octokit | undefined>();
 
@@ -24,8 +19,14 @@ export default function App() {
     <OctokitContext.Provider value={{ octokit, setOctokit }}>
       <Router>
         <Routes>
-          <Route path="/" element={<LoginPage OctokitContext={OctokitContext} />} />
-          <Route path="/app" element={<EnkiMain OctokitContext={OctokitContext} />} />
+          <Route
+            path="/"
+            element={<LoginPage OctokitContext={OctokitContext} />}
+          />
+          <Route
+            path="/app"
+            element={<EnkiMain OctokitContext={OctokitContext} />}
+          />
         </Routes>
       </Router>
     </OctokitContext.Provider>

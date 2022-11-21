@@ -249,9 +249,9 @@
       "./assets/**"
     ],
     "publish": {
-      "provider": "s3",
-      "bucket": "enki-dist",
-      "region": "us-east-1"
+      "provider": "github",
+      "owner": "ChrisDSaldivar",
+      "repo": "enki"
   }
   },
   "devEngines": {

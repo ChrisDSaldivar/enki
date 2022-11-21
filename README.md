@@ -1,6 +1,9 @@
 # Enki
 
-A desktop app that provides a GUI for taking notes on github repos/commits. You will need a github personal access token to display your repos.
+A desktop app that provides a GUI for taking notes on github repos/commits. You will need a github personal access token to display your repos. You can download the app here: 
+
+- Intel Mac: [download](https://enki-dist.s3.amazonaws.com/Enki-1.0.3.dmg)
+- ARM (M1/M2) Mac: [download](https://enki-dist.s3.amazonaws.com/Enki-arm64-1.0.3.dmg)
 
 ## Generating an Access Token
 
