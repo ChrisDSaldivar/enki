@@ -148,7 +148,7 @@ export default function EnkiMain(props: Props) {
     }
   }
 
-  const getCommit = async (file: string, commit_sha = '') => {
+  const getFile = async (file: string, commit_sha = '') => {
     const res = await octokit.rest.repos.getContent({
       owner,
       repo,
@@ -161,7 +161,7 @@ export default function EnkiMain(props: Props) {
 
   async function getFileContent(name: string, ref: string) {
     updateCode('');
-    const log = await getCommit(name, ref);
+    const log = await getFile(name, ref);
     /* eslint-disable-next-line */
       /* @ts-ignore */
     const text = Buffer.from(log.content, 'base64').toString('ascii');
@@ -169,25 +169,55 @@ export default function EnkiMain(props: Props) {
     return text;
   }
 
-  async function handleCommitClick(evt: any) {
-    const ref = evt.target.dataset.key;
+  async function handleCommitClick(
+    evt: React.MouseEvent<HTMLLIElement, MouseEvent>
+  ) {
+    /* eslint-disable-next-line */
+    /* @ts-ignore */
+    const ref = evt?.target.dataset.key;
     updateCommitRef(ref);
     updateCode('');
 
     const commit = commits.find(
       (currCommit) => currCommit.commit.sha === ref
     )?.data;
+
+    async function getSubDir (dir: { name: string; type: string; path: string }, data: any) {
+
+      if (dir.type === 'dir') {
+        
+        const res = await octokit.rest.repos.getContent({
+          owner,
+          repo,
+          path: file,
+          ref: commit_sha,
+        });
+
+        return data[dir.name] = res.data.map( file => {
+          return getSubDir()
+        });
+
+        return getSubDir(res.data);
+      }
+
+      return  { name: dir.name, ref, type: dir.type, path: dir.path };
+    }
+
     const files = commit
       /* eslint-disable-next-line */
-        /* @ts-ignore */
-      ?.filter((file: { type: string }) => file.type === 'file')
-      ?.map((file: { name: string }) => {
-        return { name: file.name, ref };
+      /* @ts-ignore */
+      // ?.filter((file: { type: string }) => file.type === 'file')
+      ?.map((file: { name: string; type: string; path: string }) => {
+        // if (file.type === )
+
+        return { name: file.name, ref, type: file.type, path: file.path };
       });
 
+    console.log(files);
     /* eslint-disable-next-line */
-      /* @ts-ignore */
+    /* @ts-ignore */
     const displayFiles = files?.filter(
+      /* eslint-disable-next-line */
       (file: any) => file.name !== 'log.txt' && !file.name.startsWith('.')
     );
     updateFiles(displayFiles ?? []);
