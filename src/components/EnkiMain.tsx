@@ -181,39 +181,14 @@ export default function EnkiMain(props: Props) {
     const commit = commits.find(
       (currCommit) => currCommit.commit.sha === ref
     )?.data;
-
-    async function getSubDir (dir: { name: string; type: string; path: string }, data: any) {
-
-      if (dir.type === 'dir') {
-        
-        const res = await octokit.rest.repos.getContent({
-          owner,
-          repo,
-          path: file,
-          ref: commit_sha,
-        });
-
-        return data[dir.name] = res.data.map( file => {
-          return getSubDir()
-        });
-
-        return getSubDir(res.data);
-      }
-
-      return  { name: dir.name, ref, type: dir.type, path: dir.path };
-    }
-
     const files = commit
       /* eslint-disable-next-line */
       /* @ts-ignore */
-      // ?.filter((file: { type: string }) => file.type === 'file')
+      ?.filter((file: { type: string }) => file.type === 'file')
       ?.map((file: { name: string; type: string; path: string }) => {
-        // if (file.type === )
-
         return { name: file.name, ref, type: file.type, path: file.path };
       });
 
-    console.log(files);
     /* eslint-disable-next-line */
     /* @ts-ignore */
     const displayFiles = files?.filter(
