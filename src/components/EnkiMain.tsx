@@ -1,3 +1,6 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-console */
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-shadow */
@@ -35,6 +38,7 @@ interface CommitBundle {
 interface File {
   name: string;
   ref: string;
+  path: string;
 }
 
 async function getGitHubName(octokit: Octokit) {
@@ -122,7 +126,7 @@ export default function EnkiMain(props: Props) {
       return;
     }
     /* eslint-disable-next-line */
-      console.log(`Getting commits for ${owner}/${repo}`);
+    console.log(`Getting commits for ${owner}/${repo}`);
     try {
       const commits = await octokit.repos.listCommits({
         owner,
@@ -159,11 +163,11 @@ export default function EnkiMain(props: Props) {
     return res.data;
   };
 
-  async function getFileContent(name: string, ref: string) {
+  async function getFileContent(path: string, ref: string) {
     updateCode('');
-    const log = await getFile(name, ref);
+    const log = await getFile(path, ref);
     /* eslint-disable-next-line */
-      /* @ts-ignore */
+    /* @ts-ignore */
     const text = Buffer.from(log.content, 'base64').toString('ascii');
 
     return text;
@@ -181,52 +185,104 @@ export default function EnkiMain(props: Props) {
     const commit = commits.find(
       (currCommit) => currCommit.commit.sha === ref
     )?.data;
-    const files = commit
-      /* eslint-disable-next-line */
-      /* @ts-ignore */
-      ?.filter((file: { type: string }) => file.type === 'file')
-      ?.map((file: { name: string; type: string; path: string }) => {
-        return { name: file.name, ref, type: file.type, path: file.path };
-      });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fileStructure: Record<string, any> = {
+      '.': [],
+    };
 
+    async function buildFS(
+      root: string,
+      files: { name: string; type: string; path: string }[],
+      commit_sha: string
+    ) {
+      for (const file of files) {
+        if (file.name === '.vscode') {
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+        if (file.type === 'file') {
+          // console.log(`${file.name} is a file`);
+          const { name, type, path } = file;
+          fileStructure[root].push({ name, type, path });
+        } else if (file.type === 'dir') {
+          // console.log(`${file.name} is a dir`);
+          const path = `${root}/${file.name}`;
+          fileStructure[path] = [];
+
+          const res = await octokit.rest.repos.getContent({
+            owner,
+            repo,
+            path: path.replace('./', ''),
+            ref: commit_sha,
+          });
+
+          await buildFS(
+            path,
+            res.data as { name: string; type: string; path: string }[],
+            commit_sha
+          );
+        }
+      }
+    }
+    await buildFS(
+      '.',
+      commit as { name: string; type: string; path: string }[],
+      ref
+    );
+    console.log(fileStructure);
+
+    const files = Object.keys(fileStructure)
+      .map((path) => {
+        const files: { name: string; type: string; path: string }[] =
+          fileStructure[path];
+        console.log(files);
+        return files.map((file) => {
+          return { name: file.name, ref, type: file.type, path: file.path };
+        });
+      })
+      .flat();
+
+    console.log(files);
     /* eslint-disable-next-line */
     /* @ts-ignore */
     const displayFiles = files?.filter(
       /* eslint-disable-next-line */
       (file: any) => file.name !== 'log.txt' && !file.name.startsWith('.')
     );
+    console.log(displayFiles);
+
     updateFiles(displayFiles ?? []);
 
     /* eslint-disable-next-line */
-      /* @ts-ignore */
+    /* @ts-ignore */
     const outputFile = files.find((file) => file.name === 'log.txt');
     if (outputFile) {
-      const outputText = await getFileContent(outputFile.name, outputFile.ref);
+      const outputText = await getFileContent(outputFile.path, outputFile.ref);
       updateOutput(outputText);
     } else {
       updateOutput('');
     }
 
     /* eslint-disable-next-line */
-      /* @ts-ignore */
+    /* @ts-ignore */
     const file =
       displayFiles.find((file: any) => file.name.endsWith('.py')) ??
       displayFiles[0];
     updateActiveFile(file.name);
 
-    const text = await getFileContent(file.name, file.ref);
+    const text = await getFileContent(file.path, file.ref);
 
     updateCode(text);
     return text;
   }
 
   async function handleFileClick(evt: any) {
-    const { ref, fileName } = evt.target.dataset;
+    const { ref, fileName, filePath } = evt.target.dataset;
 
     updateFiles(files ?? []);
     updateActiveFile(fileName);
 
-    const text = await getFileContent(fileName, commitRef);
+    const text = await getFileContent(filePath, commitRef);
     updateCode(text);
   }
 
@@ -282,7 +338,7 @@ export default function EnkiMain(props: Props) {
     updateName();
     window.electron.ipcRenderer.on('get-notes', (arg) => {
       /* eslint-disable-next-line */
-        /* @ts-ignore */
+      /* @ts-ignore */
       const notes = arg.map((val) => val.dataValues);
 
       updateNotes(notes);
@@ -375,18 +431,19 @@ export default function EnkiMain(props: Props) {
             </ul>
           </div>
           <div className="files w-72 max-w-96 max-h-full overflow-scroll scrollbar-hide overscroll-contain">
-            <ul className="flex flex-col divide-y h-full border-r border-gray-500">
+            <ul className="flex flex-col divide-y h-full border-r border-gray-500 text-left">
               {files.map((file) => {
                 /* eslint-disable-next-line */
-                  /* @ts-ignore */
+                /* @ts-ignore */
                 return (
                   <li
                     className={`${
                       file.name === activeFile ? 'bg-zinc-700' : ''
-                    } active:bg-zinc-700 hover:bg-zinc-600 cursor-pointer`}
+                    } active:bg-zinc-700 hover:bg-zinc-600 cursor-pointer py-1 pl-1`}
                     onClick={handleFileClick}
                     data-file-name={file.name}
-                    key={file.name}
+                    data-file-path={file.path}
+                    key={file.path}
                   >
                     {file.name}
                   </li>
@@ -400,10 +457,10 @@ export default function EnkiMain(props: Props) {
                 showLineNumbers
                 showInlineLineNumbers
                 /* eslint-disable-next-line */
-                  /* @ts-ignore */
+                /* @ts-ignore */
                 language={langMap[activeFile.split('.')?.at(-1)]?.toLowerCase()}
                 /* eslint-disable-next-line */
-                  /* @ts-ignore */
+                /* @ts-ignore */
                 style={styles[editorTheme]}
                 wrapLines
                 lineProps={(lineNumber) => ({
@@ -417,12 +474,12 @@ export default function EnkiMain(props: Props) {
                   },
                   onMouseEnter(evt: React.MouseEvent<HTMLElement, MouseEvent>) {
                     /* eslint-disable-next-line */
-                      /* @ts-ignore */
+                    /* @ts-ignore */
                     if (evt.target.classList.contains('linenumber')) {
                       return;
                     }
                     /* eslint-disable-next-line */
-                      /* @ts-ignore */
+                    /* @ts-ignore */
                     evt.target.classList.add('hover:bg-blue-400');
                   },
                 })}

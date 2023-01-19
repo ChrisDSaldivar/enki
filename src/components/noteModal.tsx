@@ -45,10 +45,6 @@ export default function NoteModal(props: Props) {
   const textBoxRef = useRef(null);
 
   function saveNote() {
-    if (!noteText) {
-      return;
-    }
-
     const note = {
       lineNumber,
       repo,
